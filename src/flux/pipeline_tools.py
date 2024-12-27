@@ -12,13 +12,21 @@ def encode_images(pipeline: FluxPipeline, images: Tensor):
         images - pipeline.vae.config.shift_factor
     ) * pipeline.vae.config.scaling_factor
     images_tokens = pipeline._pack_latents(images, *images.shape)
-    images_ids = pipeline._prepare_latent_image_ids(
-        images.shape[0],
-        images.shape[2],
-        images.shape[3],
-        pipeline.device,
-        pipeline.dtype,
-    )
+    try:
+        images_ids = pipeline._prepare_latent_image_ids(
+            batch_size=images.shape[0],
+            height=images.shape[2],
+            width=images.shape[3],
+            device=pipeline.device,
+            dtype=pipeline.dtype,
+        )
+    except:
+        images_ids = pipeline._prepare_latent_image_ids(
+            height=images.shape[2],
+            width=images.shape[3],
+            device=pipeline.device,
+            dtype=pipeline.dtype,
+        )
     return images_tokens, images_ids
 
 
